@@ -1,2 +1,0 @@
-# Pipeiaro
- Minesweeper-like game
