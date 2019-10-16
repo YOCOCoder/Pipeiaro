@@ -1,4 +1,4 @@
-
+import pygame
 
 # Path to sprites
 # Basically here are lot of variations of roots here: from left corner of side to right, each got unique sprite for it
@@ -6,6 +6,7 @@
 
 # Sprites counts from left to right, then first avaliable at clockwise direction.
 # Corner sprites must be in "L" pattern
+
 
 def get_sprite(fill, type, fat):
 
@@ -28,7 +29,7 @@ def get_sprite(fill, type, fat):
             if fat == 2:        # 2 - Thin
                 return get_roots_sprites("thin", "corner", "m-m")
         elif type == 2:   # 2 - Tail
-            return get_roots_sprites("thin", "tail", "m-m")
+            return get_roots_sprites("thin", "tail", "m")
 
     elif fill == 2:    # 2 - Stone
         return get_grid_sprites("stone")
@@ -56,15 +57,15 @@ def get_roots_sprites(fat, type, align, data=1):
                 "r-r": [9, "sprites/root/straight_thick.png"]
             },
             "corner": {
-                "m-l": [11, "sprites/m-m.png"],  # Middle to left
-                "m-m": [12, "sprites/m-m.png"],
-                "m-r": [13, "sprites/m-m.png"],
-                "l-l": [14, "sprites/m-m.png"],  # Left to left
-                "l-m": [15, "sprites/m-m.png"],
-                "l-r": [16, "sprites/m-m.png"],
-                "r-l": [17, "sprites/m-m.png"],  # Right to left
-                "r-m": [18, "sprites/m-m.png"],
-                "r-r": [19, "sprites/m-m.png"]
+                "m-l": [11, "sprites/root/corner_thick.png"],  # Middle to left
+                "m-m": [12, "sprites/root/corner_thick.png"],
+                "m-r": [13, "sprites/root/corner_thick.png"],
+                "l-l": [14, "sprites/root/corner_thick.png"],  # Left to left
+                "l-m": [15, "sprites/root/corner_thick.png"],
+                "l-r": [16, "sprites/root/corner_thick.png"],
+                "r-l": [17, "sprites/root/corner_thick.png"],  # Right to left
+                "r-m": [18, "sprites/root/corner_thick.png"],
+                "r-r": [19, "sprites/root/corner_thick.png"]
             }
         },
         "neck": {
@@ -80,15 +81,15 @@ def get_roots_sprites(fat, type, align, data=1):
                 "r-r": [29, "sprites/root/straight_neck.png"]
             },
             "corner": {
-                "m-l": [31, "sprites/m-m.png"],  # Middle to left
-                "m-m": [32, "sprites/m-m.png"],
-                "m-r": [33, "sprites/m-m.png"],
-                "l-l": [34, "sprites/m-m.png"],  # Left to left
-                "l-m": [35, "sprites/m-m.png"],
-                "l-r": [36, "sprites/m-m.png"],
-                "r-l": [37, "sprites/m-m.png"],  # Right to left
-                "r-m": [38, "sprites/m-m.png"],
-                "r-r": [39, "sprites/m-m.png"]
+                "m-l": [31, "sprites/root/corner_neck.png"],  # Middle to left
+                "m-m": [32, "sprites/root/corner_neck.png"],
+                "m-r": [33, "sprites/root/corner_neck.png"],
+                "l-l": [34, "sprites/root/corner_neck.png"],  # Left to left
+                "l-m": [35, "sprites/root/corner_neck.png"],
+                "l-r": [36, "sprites/root/corner_neck.png"],
+                "r-l": [37, "sprites/root/corner_neck.png"],  # Right to left
+                "r-m": [38, "sprites/root/corner_neck.png"],
+                "r-r": [39, "sprites/root/corner_neck.png"]
             }
         },
         "thin": {
@@ -104,23 +105,20 @@ def get_roots_sprites(fat, type, align, data=1):
                 "r-r": [49, "sprites/root/straight_thin.png"]
             },
             "corner": {
-                "m-l": [51, "sprites/m-m.png"],  # Middle to left
-                "m-m": [52, "sprites/m-m.png"],
-                "m-r": [53, "sprites/m-m.png"],
-                "l-l": [54, "sprites/m-m.png"],  # Left to left
-                "l-m": [55, "sprites/m-m.png"],
-                "l-r": [56, "sprites/m-m.png"],
-                "r-l": [57, "sprites/m-m.png"],  # Right to left
-                "r-m": [58, "sprites/m-m.png"],
-                "r-r": [59, "sprites/m-m.png"]
+                "m-l": [51, "sprites/root/corner_thin.png"],  # Middle to left
+                "m-m": [52, "sprites/root/corner_thin.png"],
+                "m-r": [53, "sprites/root/corner_thin.png"],
+                "l-l": [54, "sprites/root/corner_thin.png"],  # Left to left
+                "l-m": [55, "sprites/root/corner_thin.png"],
+                "l-r": [56, "sprites/root/corner_thin.png"],
+                "r-l": [57, "sprites/root/corner_thin.png"],  # Right to left
+                "r-m": [58, "sprites/root/corner_thin.png"],
+                "r-r": [59, "sprites/root/corner_thin.png"]
             },
             "tail": {
-                "straight": {
-                    "l": [61, "sprites/m-m.png"],
-                    "m": [62, "sprites/m-m.png"],
-                    "r": [63, "sprites/m-m.png"]
-                }
-
+                    "l": [61, "sprites/root/tail.png"],
+                    "m": [62, "sprites/root/tail.png"],
+                    "r": [63, "sprites/root/tail.png"]
             },
 
         },
@@ -132,7 +130,15 @@ def get_grid_sprites(name,data=0):
     sprites = {
         "grass": ["sprites/grass.png"],
         "dirt": ["sprites/dirt.png"],
-        "stone": ["sprites/grass.png"]
+        "stone": ["sprites/stone.png"]
     }
     return sprites[name][data]
 
+
+def get_selection_sprites():
+    sprites = {
+        "blue": pygame.image.load("sprites/selection_blue.png"),
+        "green": pygame.image.load("sprites/selection_green.png"),
+        "red": pygame.image.load("sprites/selection_red.png")
+    }
+    return sprites
