@@ -4,31 +4,31 @@ import pygame
 # Basically here are lot of variations of roots here: from left corner of side to right, each got unique sprite for it
 # i'm bit lazy, so just used middle to middle sprites, if you generate ones, you can browse path to it here
 
-# Sprites counts from left to right, then first avaliable at clockwise direction.
+# Sprites counts from left to right, then first available at clockwise direction.
 # Corner sprites must be in "L" pattern
 
 
-def get_sprite(fill, type, fat):
+def get_sprite(fill, root_type, fat):
 
     if fill == 0:       # 0 - Dirt
         return get_grid_sprites("dirt")
 
     elif fill == 1:     # 1 - Root
-        if type == 0:   # 0 - Straight
+        if root_type == 0:   # 0 - Straight
             if fat == 0:        # 0 - Thick
                 return get_roots_sprites("thick", "straight", "m-m")
             if fat == 1:        # 1 - Neck
                 return get_roots_sprites("neck", "straight", "m-m")
             if fat == 2:        # 2 - Thin
                 return get_roots_sprites("thin", "straight", "m-m")
-        elif type == 1:   # 1 - Corner
+        elif root_type == 1:   # 1 - Corner
             if fat == 0:        # 0 - Thick
                 return get_roots_sprites("thick", "corner", "m-m")
             if fat == 1:        # 1 - Neck
                 return get_roots_sprites("neck", "corner", "m-m")
             if fat == 2:        # 2 - Thin
                 return get_roots_sprites("thin", "corner", "m-m")
-        elif type == 2:   # 2 - Tail
+        elif root_type == 2:   # 2 - Tail
             return get_roots_sprites("thin", "tail", "m")
 
     elif fill == 2:    # 2 - Stone
@@ -38,10 +38,10 @@ def get_sprite(fill, type, fat):
         return get_grid_sprites("grass")
 
 
-# Assignment function looks like a mess, but currently i got no idea how to make look it better
+# Assignment function looks like a mess, but currently i have no idea how to make look it better
 
 
-def get_roots_sprites(fat, type, align, data=1):
+def get_roots_sprites(fat, root_type, align, data=1):
     sprites = {
 
         "thick": {
@@ -123,10 +123,10 @@ def get_roots_sprites(fat, type, align, data=1):
 
         },
     }
-    return sprites[fat][type][align][data]
+    return sprites[fat][root_type][align][data]
 
 
-def get_grid_sprites(name,data=0):
+def get_grid_sprites(name, data=0):
     sprites = {
         "grass": ["sprites/grass.png"],
         "dirt": ["sprites/dirt.png"],
