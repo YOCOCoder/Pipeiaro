@@ -2,11 +2,10 @@ import pygame
 import pickle
 import pipeiaro_cell as cl
 import tkinter
-# from tkinter import messagebox
 from tkinter import filedialog
 import os
+import random
 import pygame as pg
-import pipeiaro_field
 
 
 class Field:
@@ -23,13 +22,13 @@ class Field:
         self.sel_seq = []
         self.save_path = ""
 
-    def init_cells(self):  # To flip sprites, display need to be initialized first
-        """assign dictionary of empty cells (dirt) to field"""
+    def init_cells(self, fill=0):  # To flip sprites, display need to be initialized first
+        """assign dictionary of empty cells with fill to field"""
         cells = {}
         i = 1
         for row in range(0, self.size, 1):
             for col in range(0, self.size, 1):
-                cells[str(i)] = cl.Cell(self.screen, col * self.cell_width, row * self.cell_height)
+                cells[str(i)] = cl.Cell(self.screen, col * self.cell_width, row * self.cell_height, fill)
                 i += 1
         self.cells = cells
         self.generate_middle()
@@ -90,6 +89,25 @@ class Field:
             return cell_object
         return None
 
+    def get_cell_num_by_coord(self, **coords):
+        """
+        Returns number of cell by provided coordinates,
+        if here is no cell in coordinates, returns None
+        """
+        if "x_coord" in coords and "y_coord" in coords:
+            x_coord = coords["x_coord"]
+            y_coord = coords["y_coord"]
+        elif "pos" in coords:
+            x_coord = coords["pos"][0]
+            y_coord = coords["pos"][1]
+        else:
+            return None
+
+        if x_coord < self.cell_width * self.size and y_coord < self.cell_height * self.size:
+            cell_number = ((x_coord // self.cell_width) + 1) + ((y_coord // self.cell_height) * self.size)
+            return cell_number
+        return None
+
     def backlight(self, sprite, mouse_coord):
         """
         Draws backlight contour at cell
@@ -99,7 +117,7 @@ class Field:
             if self.selection != hover_cell:
                 self.screen.blit(sprite, (hover_cell.coord_x, hover_cell.coord_y))  # Draw marker
                 if self.selection is not None:
-                    self.selection.draw()
+                    self.selection.refresh_sprite()
                 self.selection = hover_cell
                 pygame.display.flip()
 
@@ -240,7 +258,7 @@ class Field:
                         new_rotate = 3
 
             cell.fill = new_fill
-            cell.type = new_type
+            cell.root_type = new_type
             cell.fat = new_fat
             cell.rotate = new_rotate
             cell.inverted = inverted
@@ -285,7 +303,6 @@ class Field:
                                                title="Select file",
                                                filetypes=(("Lakiaro grid file (.lkg)", "*.lkg"),
                                                          ("all files", "*.*")))
-
         if len(file_path) > 0:
             input_file = open(file_path, "rb")
             loaded = pickle.load(input_file)
@@ -309,3 +326,94 @@ class Field:
             cell.screen = screen
             cell.refresh_sprite()
         pygame.display.flip()
+
+    def get_neighborhoods_num(self, cell_number):
+        """
+        returns list with numbers of neighborhood cell, included itself
+        :param cell_number:
+        :return: list of cell numbers
+        """
+        neighborhoods = []
+        gs = self.size  # grid size
+
+        # Corners (4 neighborhoods)
+        if cell_number == 1:  # Top-left
+            neighborhoods.extend([cell_number, cell_number + 1])
+            neighborhoods.extend([cell_number + gs, cell_number + gs + 1])
+            return neighborhoods
+        elif cell_number == gs:  # Top-right
+            neighborhoods.extend([cell_number - 1, cell_number])
+            neighborhoods.extend([cell_number + gs - 1, cell_number + gs])
+            return neighborhoods
+        elif cell_number == (gs ** 2 - gs):   # Bottom-left
+            neighborhoods.extend([cell_number - gs, cell_number - gs + 1])
+            neighborhoods.extend([cell_number, cell_number + 1])
+            return neighborhoods
+        elif cell_number == gs ** 2:   # Bottom-right
+            neighborhoods.extend([cell_number - gs - 1, cell_number - gs])
+            neighborhoods.extend([cell_number - 1, cell_number])
+            return neighborhoods
+        # Edges (6 neighborhoods)
+        elif cell_number < gs:    # Top edge
+            neighborhoods.extend([cell_number - 1, cell_number, cell_number + 1])
+            neighborhoods.extend([cell_number + gs - 1, cell_number + gs, cell_number + gs + 1])
+            return neighborhoods
+        elif cell_number % gs == 0:    # Right edge
+            neighborhoods.extend([cell_number - gs - 1, cell_number - gs])
+            neighborhoods.extend([cell_number - 1, cell_number])
+            neighborhoods.extend([cell_number + gs - 1, cell_number + gs])
+            return neighborhoods
+        elif cell_number > (gs ** 2 - gs):  # Bottom edge
+            neighborhoods.extend([cell_number - gs - 1, cell_number - gs, cell_number - gs + 1])
+            neighborhoods.extend([cell_number - 1, cell_number, cell_number + 1])
+            return neighborhoods
+        elif cell_number % self.size == 1:    # Left edge
+            neighborhoods.extend([cell_number - gs, cell_number - gs + 1])
+            neighborhoods.extend([cell_number, cell_number + 1])
+            neighborhoods.extend([cell_number + gs, cell_number + gs + 1])
+            return neighborhoods
+        else:
+            # Full neighborhoods
+            neighborhoods.extend([cell_number - gs - 1, cell_number - gs, cell_number - gs + 1])
+            neighborhoods.extend([cell_number - 1, cell_number, cell_number + 1])
+            neighborhoods.extend([cell_number + gs - 1, cell_number + gs, cell_number + gs + 1])
+            return neighborhoods
+
+
+class Playfield(Field):
+
+    def __init__(self, field, strength=7, tries=22):
+        super(Playfield, self).__init__()
+        self.strength = strength
+        self.tries = tries
+        self.dirt = 0
+        self.roots = 0
+        self.stones = 0
+        self.field = field
+
+    def open_cell(self, click_coord):
+        click_cell = self.get_cell_num_by_coord(pos=click_coord)
+        if click_cell not in self.cells.items():
+            self.cells[str(click_cell)] = self.field.cells[str(click_cell)]     # Open current cell
+            near_cells = self.field.get_neighborhoods_num(click_cell)
+            near_cells.remove(click_cell)
+            dirt_cells = near_cells.copy()
+
+            # Leave cells with dirt only and shuffle them
+            for nc in near_cells:
+                if self.field.cells[str(nc)].fill != 0:
+                    dirt_cells.remove(nc)
+            random.shuffle(dirt_cells)
+
+            # How many allowed cells can be opened
+            if len(dirt_cells) > self.strength:
+                open_cells = dirt_cells[:self.strength]
+            else:
+                open_cells = dirt_cells
+
+            for cell_num in open_cells:
+                self.cells[str(cell_num)] = self.field.cells[str(cell_num)]
+
+            self.draw()
+            pygame.display.flip()
+

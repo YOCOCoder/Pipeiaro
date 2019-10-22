@@ -5,7 +5,7 @@ import pipeiaro_sprites as ps
 class Cell:
     """Info about cell contain"""
 
-    def __init__(self, screen, coord_x, coord_y, cell_size = 48, fill=0, root_type=0, fat=0, rotate=0, in_align=0, out_align=0, inverted=False):
+    def __init__(self, screen, coord_x, coord_y, fill=0, root_type=0, fat=0, rotate=0, in_align=0, out_align=0, inverted=False):
         self.coord_x = coord_x
         self.coord_y = coord_y
         self.cell_size = 48
